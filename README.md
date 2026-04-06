@@ -1,0 +1,880 @@
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sesi 4 – Polimorfisme & Abstraksi | Yoga · 1231231 · TI2</title>
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0d0f14">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ── Force dark theme — GitHub Pages safe ── */
+  html {
+    background-color: #0d0f14 !important;
+    color-scheme: dark !important;
+  }
+  :root {
+    --bg:#0d0f14; --surface:#141720; --surface2:#1c2030; --border:#2a2f42;
+    --accent:#7c6af7; --accent2:#4fd1c5; --accent3:#f6ad55;
+    --text:#e2e8f0; --muted:#718096; --dart-blue:#00b4d8;
+    --green:#68d391; --pink:#f687b3; --code-bg:#0a0c10;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:#0d0f14 !important;background-color:#0d0f14 !important;color:#e2e8f0 !important;
+    font-family:'Syne',sans-serif;line-height:1.7;overflow-x:hidden;}
+  /* Override any GitHub Pages / Jekyll injected styles */
+  body > *{background:transparent;}
+
+  /* HEADER */
+  header{position:relative;padding:72px 40px 56px;text-align:center;overflow:hidden;
+    background:#0d0f14;}
+  header::before{content:'';position:absolute;inset:0;
+    background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(124,106,247,.18) 0%,transparent 70%),
+               radial-gradient(ellipse 50% 40% at 80% 80%,rgba(79,209,197,.10) 0%,transparent 60%);
+    pointer-events:none;}
+  .badge{display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#fff;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;
+    padding:6px 18px;border-radius:40px;margin-bottom:20px;}
+  header h1{font-size:clamp(2rem,5vw,3.4rem);font-weight:800;line-height:1.1;
+    background:linear-gradient(135deg,#fff 30%,var(--accent) 100%);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:14px;}
+  header p{color:var(--muted);font-size:.95rem;max-width:540px;margin:0 auto;}
+
+  /* STUDENT CARD */
+  .student-card{
+    display:inline-flex;align-items:center;gap:20px;
+    background:var(--surface);border:1px solid var(--accent);
+    border-radius:14px;padding:14px 28px;margin-top:28px;
+    position:relative;overflow:hidden;
+  }
+  .student-card::before{
+    content:'';position:absolute;inset:0;
+    background:linear-gradient(135deg,rgba(124,106,247,.08),rgba(79,209,197,.05));
+    pointer-events:none;
+  }
+  .student-avatar{
+    width:44px;height:44px;border-radius:12px;flex-shrink:0;
+    background:linear-gradient(135deg,var(--accent),var(--dart-blue));
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;font-weight:800;color:#fff;
+  }
+  .student-info{text-align:left;}
+  .student-name{font-size:1rem;font-weight:800;color:#e2e8f0 !important;}
+  .student-meta{font-size:.8rem;color:#718096 !important;margin-top:2px;}
+  .student-meta span{color:#4fd1c5 !important;font-weight:700;margin:0 6px;}
+
+  .meta-row{display:flex;justify-content:center;gap:16px;margin-top:20px;flex-wrap:wrap;}
+  .meta-chip{background:var(--surface);border:1px solid var(--border);border-radius:8px;
+    padding:6px 14px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:7px;}
+  .meta-chip span{color:var(--accent2);font-weight:700;}
+
+  /* LAYOUT */
+  .container{max-width:960px;margin:0 auto;padding:0 24px 80px;}
+
+  /* SECTION */
+  .section{margin-bottom:52px;animation:fadeUp .5s ease both;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  .section-header{display:flex;align-items:center;gap:14px;margin-bottom:22px;
+    padding-bottom:14px;border-bottom:1px solid var(--border);}
+  .section-number{width:34px;height:34px;border-radius:8px;flex-shrink:0;
+    background:linear-gradient(135deg,var(--accent),var(--dart-blue));
+    display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;}
+  .section-header h2{font-size:1.2rem;font-weight:700;color:#e2e8f0 !important;}
+  .card h3{font-size:.95rem;font-weight:700;color:#4fd1c5 !important;margin-bottom:10px;}
+  .card p,.card li{font-size:.9rem;color:#718096 !important;margin-bottom:5px;}
+  .card strong{color:#e2e8f0 !important;}
+  .code-lang{font-family:'JetBrains Mono',monospace;font-size:11px;color:#00b4d8 !important;
+    font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+  .out-lbl{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;
+    color:#68d391 !important;letter-spacing:1px;}
+  .hint{font-size:11px;color:#f6ad55 !important;font-style:italic;}
+  .out-line{font-family:'JetBrains Mono',monospace;font-size:12px;
+    color:#a8d8a8 !important;line-height:1.8;}
+  .iframe-hdr span{font-size:12px;font-weight:700;color:#7c6af7 !important;
+    font-family:'JetBrains Mono',monospace;letter-spacing:.5px;}
+  .full-btn{font-size:11px;color:#4fd1c5 !important;font-weight:700;text-decoration:none;
+    background:#1c2030 !important;border:1px solid #2a2f42;padding:4px 12px;
+    border-radius:6px;transition:background .2s;}
+  .pill{background:#1c2030 !important;border:1px solid #2a2f42;color:#7c6af7 !important;
+    font-size:11px;font-weight:700;padding:4px 13px;border-radius:40px;letter-spacing:.5px;}
+  .pill.teal{color:#4fd1c5 !important;} .pill.yellow{color:#f6ad55 !important;}
+  .pill.green{color:#68d391 !important;} .pill.pink{color:#f687b3 !important;}
+  .summary-box h3{color:#7c6af7 !important;margin-bottom:14px;font-size:1rem;}
+  .summary-box li{color:#e2e8f0 !important;margin-bottom:8px;font-size:.9rem;}
+  .meta-chip{background:#141720 !important;border:1px solid #2a2f42;border-radius:8px;
+    padding:6px 14px;font-size:12px;color:#718096 !important;}
+  .meta-chip span{color:#4fd1c5 !important;font-weight:700;}
+  footer{text-align:center;padding:28px;color:#718096 !important;font-size:12px;
+    border-top:1px solid #2a2f42;background:#0d0f14 !important;}
+  header p{color:#718096 !important;font-size:.95rem;max-width:540px;margin:0 auto;}
+  .bonus-tag{display:inline-block;background:linear-gradient(135deg,#f6ad55,#f687b3);
+    color:#1a1a1a !important;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;
+    padding:3px 10px;border-radius:4px;margin-left:8px;vertical-align:middle;}
+
+  /* CARD */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+    padding:22px 26px;margin-bottom:18px;transition:border-color .2s;}
+  .card:hover{border-color:var(--accent);}
+  .card h3{font-size:.95rem;font-weight:700;color:var(--accent2);margin-bottom:10px;}
+  .card p,.card li{font-size:.9rem;color:var(--muted);margin-bottom:5px;}
+  .card ul{padding-left:18px;} .card li{margin-bottom:3px;}
+  .card strong{color:var(--text);}
+
+  /* TABLE */
+  table{width:100%;border-collapse:collapse;font-size:.88rem;border-radius:12px;overflow:hidden;}
+  th{background:var(--surface2);color:var(--accent2);padding:11px 16px;text-align:left;font-weight:700;}
+  td{padding:10px 16px;border-bottom:1px solid var(--border);color:var(--muted);}
+  tr:last-child td{border-bottom:none;}
+  tr:hover td{background:var(--surface2);color:var(--text);}
+
+  /* CODE WRAPPER */
+  .code-wrapper{background:var(--code-bg);border:1px solid var(--border);
+    border-radius:14px;overflow:hidden;margin:16px 0;}
+  .code-header{display:flex;align-items:center;justify-content:space-between;
+    padding:10px 18px;background:var(--surface2);border-bottom:1px solid var(--border);}
+  .code-lang{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dart-blue);
+    font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+  .dartpad-btn{display:inline-flex;align-items:center;gap:7px;
+    background:linear-gradient(135deg,var(--accent),var(--dart-blue));
+    color:#fff;font-size:11px;font-weight:700;padding:5px 14px;border-radius:6px;
+    text-decoration:none;letter-spacing:.5px;transition:opacity .2s,transform .1s;}
+  .dartpad-btn:hover{opacity:.85;transform:scale(1.03);}
+  .dartpad-btn svg{width:13px;height:13px;}
+  pre{padding:18px 22px;overflow-x:auto;font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;line-height:1.75;}
+
+  /* SYNTAX */
+  .kw{color:#c792ea;} .cl{color:#82aaff;} .fn{color:#82aaff;}
+  .st{color:#c3e88d;} .cm{color:#546e7a;font-style:italic;}
+  .at{color:var(--accent3);} .nu{color:#f78c6c;} .ty{color:var(--accent2);} .op{color:#89ddff;}
+
+  /* OUTPUT PANEL */
+  .out-panel{border-top:1px solid var(--border);}
+  .out-hdr{display:flex;align-items:center;justify-content:space-between;
+    padding:8px 18px;background:rgba(104,211,145,.07);border-bottom:1px solid var(--border);}
+  .out-lbl{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;
+    color:var(--green);letter-spacing:1px;}
+  .hint{font-size:11px;color:var(--accent3);font-style:italic;}
+  .out-body{padding:14px 22px;}
+  .out-line{font-family:'JetBrains Mono',monospace;font-size:12px;
+    color:#a8d8a8;line-height:1.8;white-space:pre;}
+  .out-line:empty{height:10px;}
+
+  /* IFRAME */
+  .iframe-wrap{border-top:2px solid var(--accent);}
+  .iframe-hdr{display:flex;align-items:center;justify-content:space-between;
+    padding:10px 18px;background:rgba(124,106,247,.08);}
+  .iframe-hdr span{font-size:12px;font-weight:700;color:var(--accent);
+    font-family:'JetBrains Mono',monospace;letter-spacing:.5px;}
+  .full-btn{font-size:11px;color:var(--accent2);font-weight:700;text-decoration:none;
+    background:var(--surface2);border:1px solid var(--border);padding:4px 12px;
+    border-radius:6px;transition:background .2s;}
+  .full-btn:hover{background:var(--surface);}
+  .iframe-wrap iframe{display:block;border:none;background:#1e2030;}
+
+  /* GRID */
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media(max-width:620px){.grid-2{grid-template-columns:1fr;}}
+
+  /* PILLS */
+  .pills{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;}
+  .pill{background:var(--surface2);border:1px solid var(--border);color:var(--accent);
+    font-size:11px;font-weight:700;padding:4px 13px;border-radius:40px;letter-spacing:.5px;}
+  .pill.teal{color:var(--accent2);} .pill.yellow{color:var(--accent3);}
+  .pill.green{color:var(--green);} .pill.pink{color:var(--pink);}
+
+  /* BONUS */
+  .bonus-tag{display:inline-block;background:linear-gradient(135deg,var(--accent3),var(--pink));
+    color:#1a1a1a;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;
+    padding:3px 10px;border-radius:4px;margin-left:8px;vertical-align:middle;}
+
+  /* SUMMARY */
+  .summary-box{background:linear-gradient(135deg,rgba(124,106,247,.08) 0%,rgba(79,209,197,.06) 100%);
+    border:1px solid rgba(124,106,247,.3);border-radius:14px;padding:26px;}
+  .summary-box h3{color:var(--accent);margin-bottom:14px;font-size:1rem;}
+  .summary-box ol{padding-left:20px;}
+  .summary-box li{color:var(--text);margin-bottom:8px;font-size:.9rem;}
+
+  /* FOOTER */
+  footer{text-align:center;padding:28px;color:var(--muted);font-size:12px;
+    border-top:1px solid var(--border);}
+  /* ── GitHub Pages override lock ── */
+  html,body,.container,header,footer,
+  .section,.card,.code-wrapper,.out-panel,.iframe-wrap,
+  .out-body,.out-hdr,.code-header,.iframe-hdr,
+  .section-header,.summary-box,.student-card {
+    color: inherit;
+  }
+  /* Explicit background hard-locks */
+  .card             { background:#141720 !important; }
+  .code-wrapper     { background:#0a0c10 !important; }
+  .code-header      { background:#1c2030 !important; }
+  .out-body         { background:#0a0c10 !important; }
+  .out-hdr          { background:rgba(104,211,145,.07) !important; }
+  .iframe-hdr       { background:rgba(124,106,247,.08) !important; }
+  pre               { background:#0a0c10 !important; color:#e2e8f0 !important; }
+  table             { background:#0d0f14 !important; }
+  th                { background:#1c2030 !important; color:#4fd1c5 !important; }
+  td                { color:#718096 !important; }
+  tr:hover td       { background:#1c2030 !important; color:#e2e8f0 !important; }
+  .summary-box      { background:linear-gradient(135deg,rgba(124,106,247,.08) 0%,rgba(79,209,197,.06) 100%) !important; }
+  .meta-chip        { background:#141720 !important; }
+</style>
+</head>
+<body style="background:#0d0f14 !important;">
+
+<!--
+  ╔══════════════════════════════════════════════════════╗
+  ║  GITHUB PAGES SETUP — agar background tetap gelap   ║
+  ║  Buat file _config.yml di root repo dengan isi:     ║
+  ║    theme: null                                       ║
+  ║  Atau buat file kosong bernama .nojekyll di root.    ║
+  ╚══════════════════════════════════════════════════════╝
+
+  PSEUDOCODE — Nama / NIM / Kelas:
+  ─────────────────────────────────
+  MAHASISWA.nama    = "Rifqi Prayoga"
+  MAHASISWA.nim     = "251410005"
+  MAHASISWA.kelas   = "SI2A"
+  MAHASISWA.matkul  = "Pemrograman — Sesi 4"
+  MAHASISWA.topik   = "Polimorfisme & Abstraksi (Dart)"
+  MAHASISWA.output  → Resume HTML + Live DartPad Embed
+  ─────────────────────────────────
+-->
+
+<div id="gh-notice" style="
+  display:none;position:fixed;top:0;left:0;right:0;z-index:9999;
+  background:#1c2030;border-bottom:2px solid #7c6af7;
+  padding:10px 20px;font-family:'JetBrains Mono',monospace;font-size:12px;
+  color:#e2e8f0;text-align:center;
+">
+  ⚠ Jika background putih di GitHub Pages: buat file <code style="color:#4fd1c5">.nojekyll</code> di root repo kamu.
+  <button onclick="document.getElementById('gh-notice').style.display='none'"
+    style="margin-left:16px;background:#7c6af7;border:none;color:#fff;
+    padding:3px 10px;border-radius:4px;cursor:pointer;font-size:11px;">✕ Tutup</button>
+</div>
+<script>
+  // Show notice only when background is white (GitHub Pages issue)
+  window.addEventListener('load', function() {
+    var bg = window.getComputedStyle(document.body).backgroundColor;
+    // rgb(255,255,255) = white
+    if (bg === 'rgb(255, 255, 255)' || bg === 'rgba(0, 0, 0, 0)') {
+      document.getElementById('gh-notice').style.display = 'block';
+      document.body.style.background = '#0d0f14';
+      document.documentElement.style.background = '#0d0f14';
+    }
+  });
+</script>
+
+<header>
+  <div class="badge">Pemrograman · Sesi 4</div>
+  <h1>Polimorfisme<br>&amp; Abstraksi</h1>
+  <p>Resume lengkap OOP lanjutan di Dart — kode bisa langsung dijalankan otomatis di DartPad.</p>
+
+  <div style="display:flex;justify-content:center;">
+    <div class="student-card">
+      <div class="student-avatar">R</div>
+      <div class="student-info">
+        <div class="student-name">Rifqi Prayoga</div>
+        <div class="student-meta">NIM <span>251410005</span> · Kelas <span>SI2A</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="meta-row">
+    <div class="meta-chip">⏱ Durasi <span>200 menit</span></div>
+    <div class="meta-chip">📄 Slides <span>16</span></div>
+    <div class="meta-chip">🎯 Level <span>Menengah</span></div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ── 1. POLIMORFISME ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-number">1</div>
+      <h2>Polimorfisme (Polymorphism)</h2>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h3>📖 Definisi</h3>
+        <p><strong>Poly</strong> = banyak, <strong>morph</strong> = bentuk. Objek dari berbagai subclass diperlakukan sebagai objek dari superclass yang sama.</p>
+        <div class="pills"><span class="pill teal">Runtime polymorphism</span><span class="pill">Method overriding</span></div>
+      </div>
+      <div class="card">
+        <h3>✅ Manfaat</h3>
+        <ul>
+          <li><strong>Fleksibilitas</strong> – kode bekerja dengan berbagai tipe</li>
+          <li><strong>Extensibility</strong> – mudah tambah tipe baru</li>
+          <li><strong>Reusability</strong> – method umum di superclass</li>
+          <li><strong>Maintainability</strong> – perubahan mudah dikelola</li>
+        </ul>
+      </div>
+    </div>
+    <p style="font-size:.88rem;color:var(--muted);margin-bottom:12px;">Dart mendukung <strong style="color:var(--text)">runtime polymorphism</strong> via method overriding. Compile-time (overloading) tidak didukung.</p>
+    <div class="code-wrapper">
+      <div class="code-header">
+        <span class="code-lang">🎯 Polimorfisme Dasar</span>
+       
+      </div>
+<pre><span class="cm">// Nama  : Rifqi Prayoga</span>
+<span class="cm">// NIM   : 251410005</span>
+<span class="cm">// Kelas : SI2A</span>
+
+<span class="kw">class</span> <span class="cl">Bentuk</span> {
+  <span class="kw">void</span> <span class="fn">gambar</span>() <span class="op">=></span> <span class="fn">print</span>(<span class="st">'Menggambar bentuk'</span>);
+}
+<span class="kw">class</span> <span class="cl">Lingkaran</span> <span class="kw">extends</span> <span class="cl">Bentuk</span> {
+  <span class="at">@override</span>
+  <span class="kw">void</span> <span class="fn">gambar</span>() <span class="op">=></span> <span class="fn">print</span>(<span class="st">'Menggambar lingkaran ◯'</span>);
+}
+<span class="kw">class</span> <span class="cl">Persegi</span> <span class="kw">extends</span> <span class="cl">Bentuk</span> {
+  <span class="at">@override</span>
+  <span class="kw">void</span> <span class="fn">gambar</span>() <span class="op">=></span> <span class="fn">print</span>(<span class="st">'Menggambar persegi ◱'</span>);
+}
+<span class="kw">class</span> <span class="cl">Segitiga</span> <span class="kw">extends</span> <span class="cl">Bentuk</span> {
+  <span class="at">@override</span>
+  <span class="kw">void</span> <span class="fn">gambar</span>() <span class="op">=></span> <span class="fn">print</span>(<span class="st">'Menggambar segitiga △'</span>);
+}
+<span class="kw">void</span> <span class="fn">main</span>() {
+  <span class="ty">List</span>&lt;<span class="cl">Bentuk</span>&gt; bentuk <span class="op">=</span> [<span class="cl">Lingkaran</span>(), <span class="cl">Persegi</span>(), <span class="cl">Segitiga</span>()];
+  <span class="kw">for</span> (<span class="kw">var</span> b <span class="kw">in</span> bentuk) {
+    b.<span class="fn">gambar</span>();
+  }
+}</pre>
+      <div class="out-panel">
+        <div class="out-hdr"><span class="out-lbl">▶ Expected Output</span></div>
+        <div class="out-body">
+          <div class="out-line">Menggambar lingkaran</div>
+          <div class="out-line">Menggambar persegi</div>
+          <div class="out-line">Menggambar segitiga</div>
+        </div>
+      </div>
+      <div class="iframe-wrap">
+        <div class="iframe-hdr">
+          <span>⚡ Live DartPad — Otomatis Berjalan</span>
+          <a href="https://dartpad.dev/?run=true&split=60&source=import%20%27dart%3Acore%27%3B%0A%0Aclass%20Bentuk%20%7B%0A%20%20void%20gambar%28%29%20%3D%3E%20print%28%27Menggambar%20bentuk%27%29%3B%0A%7D%0A%0Aclass%20Lingkaran%20extends%20Bentuk%20%7B%0A%20%20%40override%0A%20%20void%20gambar%28%29%20%3D%3E%20print%28%27Menggambar%20lingkaran%27%29%3B%0A%7D%0A%0Aclass%20Persegi%20extends%20Bentuk%20%7B%0A%20%20%40override%0A%20%20void%20gambar%28%29%20%3D%3E%20print%28%27Menggambar%20persegi%27%29%3B%0A%7D%0A%0Aclass%20Segitiga%20extends%20Bentuk%20%7B%0A%20%20%40override%0A%20%20void%20gambar%28%29%20%3D%3E%20print%28%27Menggambar%20segitiga%27%29%3B%0A%7D%0A%0Avoid%20main%28%29%20%7B%0A%20%20List%3CBentuk%3E%20bentuk%20%3D%20%5BLingkaran%28%29%2C%20Persegi%28%29%2C%20Segitiga%28%29%5D%3B%0A%20%20for%20%28var%20b%20in%20bentuk%29%20%7B%0A%20%20%20%20b.gambar%28%29%3B%0A%20%20%7D%0A%7D" target="_blank" class="full-btn">Layar Penuh ↗</a>
+        </div>
+        <iframe src="https://dartpad.dev/embed-dart.html?id=74f05c93643ff64d6863750890f61621&run=true&v=1234" width="100%" height="440" frameborder="0" loading="lazy"></iframe>
+      </div>
+    </div>
+    <div class="code-wrapper">
+      <div class="code-header">
+        <span class="code-lang">🎯 Operator <code>is</code> dan <code>as</code></span>
+      
+      </div>
+<pre><span class="cm">// Nama  : Rifqi Prayoga</span>
+<span class="cm">// NIM   : 251410005</span>
+<span class="cm">// Kelas : SI2A</span>
+
+<span class="kw">class</span> <span class="cl">Kendaraan</span> { <span class="ty">String</span> nama; <span class="cl">Kendaraan</span>(<span class="kw">this</span>.nama); }
+<span class="kw">class</span> <span class="cl">Mobil</span> <span class="kw">extends</span> <span class="cl">Kendaraan</span> {
+  <span class="cl">Mobil</span>(<span class="ty">String</span> nama) : <span class="kw">super</span>(nama);
+  <span class="kw">void</span> <span class="fn">klakson</span>() <span class="op">=></span> <span class="fn">print</span>(<span class="st">'$nama: Tin-Tin!'</span>);
+}
+<span class="kw">class</span> <span class="cl">Motor</span> <span class="kw">extends</span> <span class="cl">Kendaraan</span> {
+  <span class="cl">Motor</span>(<span class="ty">String</span> nama) : <span class="kw">super</span>(nama);
+  <span class="kw">void</span> <span class="fn">knalpot</span>() <span class="op">=></span> <span class="fn">print</span>(<span class="st">'$nama: Froorr!'</span>);
+}
+<span class="kw">void</span> <span class="fn">main</span>() {
+  <span class="ty">List</span>&lt;<span class="cl">Kendaraan</span>&gt; list <span class="op">=</span> [<span class="cl">Mobil</span>(<span class="st">'Toyota'</span>), <span class="cl">Motor</span>(<span class="st">'Honda'</span>), <span class="cl">Mobil</span>(<span class="st">'BMW'</span>)];
+  <span class="kw">for</span> (<span class="kw">var</span> k <span class="kw">in</span> list) {
+    <span class="kw">if</span> (k <span class="kw">is</span> <span class="cl">Mobil</span>) (k <span class="kw">as</span> <span class="cl">Mobil</span>).<span class="fn">klakson</span>();
+    <span class="kw">else if</span> (k <span class="kw">is</span> <span class="cl">Motor</span>) (k <span class="kw">as</span> <span class="cl">Motor</span>).<span class="fn">knalpot</span>();
+  }
+}</pre>
+      <div class="out-panel">
+        <div class="out-hdr"><span class="out-lbl">▶ Expected Output</span></div>
+        <div class="out-body">
+          <div class="out-line">Toyota: Tin-Tin!</div>
+          <div class="out-line">Honda: Froorr!</div>
+          <div class="out-line">BMW: Tin-Tin!</div>
+        </div>
+      </div>
+      <div class="iframe-wrap">
+        <div class="iframe-hdr">
+          <span>⚡ Live DartPad — Otomatis Berjalan</span>
+          <a href="https://dartpad.dev/?run=true&split=60&source=class%20Kendaraan%20%7B%0A%20%20String%20nama%3B%0A%20%20Kendaraan%28this.nama%29%3B%0A%7D%0Aclass%20Mobil%20extends%20Kendaraan%20%7B%0A%20%20Mobil%28String%20nama%29%20%3A%20super%28nama%29%3B%0A%20%20void%20klakson%28%29%20%3D%3E%20print%28%27%24nama%3A%20Tin-Tin%21%27%29%3B%0A%7D%0Aclass%20Motor%20extends%20Kendaraan%20%7B%0A%20%20Motor%28String%20nama%29%20%3A%20super%28nama%29%3B%0A%20%20void%20knalpot%28%29%20%3D%3E%20print%28%27%24nama%3A%20Froorr%21%27%29%3B%0A%7D%0Avoid%20main%28%29%20%7B%0A%20%20List%3CKendaraan%3E%20kendaraan%20%3D%20%5BMobil%28%27Toyota%27%29%2C%20Motor%28%27Honda%27%29%2C%20Mobil%28%27BMW%27%29%5D%3B%0A%20%20for%20%28var%20k%20in%20kendaraan%29%20%7B%0A%20%20%20%20if%20%28k%20is%20Mobil%29%20%7B%0A%20%20%20%20%20%20%28k%20as%20Mobil%29.klakson%28%29%3B%0A%20%20%20%20%7D%20else%20if%20%28k%20is%20Motor%29%20%7B%0A%20%20%20%20%20%20%28k%20as%20Motor%29.knalpot%28%29%3B%0A%20%20%20%20%7D%0A%20%20%7D%0A%7D" target="_blank" class="full-btn">Layar Penuh ↗</a>
+        </div>
+        <iframe src="https://dartpad.dev/embed-dart.html?id=87fdd0a219d4c5530bb32032151feb8a&run=true&v=1234" width="100%" height="440" frameborder="0" loading="lazy"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. ABSTRAKSI ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-number">2</div>
+      <h2>Abstraksi — Abstract Class</h2>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h3>📖 Konsep</h3>
+        <p>Menyembunyikan detail implementasi. Fokus pada <strong>"apa"</strong> bukan <strong>"bagaimana"</strong>.</p>
+      </div>
+      <div class="card">
+        <h3>🛠 Aturan</h3>
+        <ul>
+          <li>Tidak bisa diinstansiasi langsung</li>
+          <li>Method <strong>abstract</strong> = tanpa body, wajib di-override</li>
+          <li>Method <strong>concrete</strong> = sudah ada implementasi</li>
+        </ul>
+      </div>
+    </div>
+    <div class="code-wrapper">
+      <div class="code-header">
+        <span class="code-lang">🎯 Abstract Class</span>
+       
+      </div>
+<pre><span class="cm">// Nama  : Rifqi Prayoga</span>
+<span class="cm">// NIM   : 251410005</span>
+<span class="cm">// Kelas : SI2A</span>
+
+<span class="kw">abstract class</span> <span class="cl">Kendaraan</span> {
+  <span class="ty">String</span>? merk;
+  <span class="kw">void</span> <span class="fn">start</span>();          <span class="cm">// abstract</span>
+  <span class="ty">String</span> <span class="fn">getInfo</span>();      <span class="cm">// abstract</span>
+  <span class="kw">void</span> <span class="fn">stop</span>() { <span class="fn">print</span>(<span class="st">'$merk berhenti'</span>); }  <span class="cm">// concrete</span>
+}
+<span class="kw">class</span> <span class="cl">Mobil</span> <span class="kw">extends</span> <span class="cl">Kendaraan</span> {
+  <span class="cl">Mobil</span>({<span class="kw">required</span> <span class="ty">String</span> merk}) { <span class="kw">this</span>.merk <span class="op">=</span> merk; }
+  <span class="at">@override</span> <span class="kw">void</span> <span class="fn">start</span>() <span class="op">=></span> <span class="fn">print</span>(<span class="st">'$merk: Mesin mobil menyala'</span>);
+  <span class="at">@override</span> <span class="ty">String</span> <span class="fn">getInfo</span>() <span class="op">=></span> <span class="st">'Mobil merk $merk'</span>;
+}
+<span class="kw">class</span> <span class="cl">SepedaMotor</span> <span class="kw">extends</span> <span class="cl">Kendaraan</span> {
+  <span class="cl">SepedaMotor</span>({<span class="kw">required</span> <span class="ty">String</span> merk}) { <span class="kw">this</span>.merk <span class="op">=</span> merk; }
+  <span class="at">@override</span> <span class="kw">void</span> <span class="fn">start</span>() <span class="op">=></span> <span class="fn">print</span>(<span class="st">'$merk: Mesin motor nyala'</span>);
+  <span class="at">@override</span> <span class="ty">String</span> <span class="fn">getInfo</span>() <span class="op">=></span> <span class="st">'Sepeda motor merk $merk'</span>;
+}
+<span class="kw">void</span> <span class="fn">main</span>() {
+  <span class="ty">List</span>&lt;<span class="cl">Kendaraan</span>&gt; garasi <span class="op">=</span> [<span class="cl">Mobil</span>(merk: <span class="st">'Toyota'</span>), <span class="cl">SepedaMotor</span>(merk: <span class="st">'Honda'</span>)];
+  <span class="kw">for</span> (<span class="kw">var</span> k <span class="kw">in</span> garasi) { <span class="fn">print</span>(k.<span class="fn">getInfo</span>()); k.<span class="fn">start</span>(); k.<span class="fn">stop</span>(); <span class="fn">print</span>(<span class="st">'---'</span>); }
+}</pre>
+      <div class="out-panel">
+        <div class="out-hdr"><span class="out-lbl">▶ Expected Output</span></div>
+        <div class="out-body">
+          <div class="out-line">Mobil merk Toyota</div>
+          <div class="out-line">Toyota: Mesin mobil menyala</div>
+          <div class="out-line">Toyota berhenti</div>
+          <div class="out-line">---</div>
+          <div class="out-line">Sepeda motor merk Honda</div>
+          <div class="out-line">Honda: Mesin motor nyala</div>
+          <div class="out-line">Honda berhenti</div>
+          <div class="out-line">---</div>
+        </div>
+      </div>
+      <div class="iframe-wrap">
+        <div class="iframe-hdr">
+          <span>⚡ Live DartPad — Otomatis Berjalan</span>
+          <a href="https://dartpad.dev/?run=true&split=60&source=abstract%20class%20Kendaraan%20%7B%0A%20%20String%3F%20merk%3B%0A%20%20void%20start%28%29%3B%0A%20%20String%20getInfo%28%29%3B%0A%20%20void%20stop%28%29%20%7B%0A%20%20%20%20print%28%27%24merk%20berhenti%27%29%3B%0A%20%20%7D%0A%7D%0Aclass%20Mobil%20extends%20Kendaraan%20%7B%0A%20%20Mobil%28%7Brequired%20String%20merk%7D%29%20%7B%20this.merk%20%3D%20merk%3B%20%7D%0A%20%20%40override%0A%20%20void%20start%28%29%20%3D%3E%20print%28%27%24merk%3A%20Mesin%20mobil%20menyala%27%29%3B%0A%20%20%40override%0A%20%20String%20getInfo%28%29%20%3D%3E%20%27Mobil%20merk%20%24merk%27%3B%0A%7D%0Aclass%20SepedaMotor%20extends%20Kendaraan%20%7B%0A%20%20SepedaMotor%28%7Brequired%20String%20merk%7D%29%20%7B%20this.merk%20%3D%20merk%3B%20%7D%0A%20%20%40override%0A%20%20void%20start%28%29%20%3D%3E%20print%28%27%24merk%3A%20Mesin%20motor%20nyala%27%29%3B%0A%20%20%40override%0A%20%20String%20getInfo%28%29%20%3D%3E%20%27Sepeda%20motor%20merk%20%24merk%27%3B%0A%7D%0Avoid%20main%28%29%20%7B%0A%20%20List%3CKendaraan%3E%20garasi%20%3D%20%5BMobil%28merk%3A%20%27Toyota%27%29%2C%20SepedaMotor%28merk%3A%20%27Honda%27%29%5D%3B%0A%20%20for%20%28var%20k%20in%20garasi%29%20%7B%0A%20%20%20%20print%28k.getInfo%28%29%29%3B%0A%20%20%20%20k.start%28%29%3B%0A%20%20%20%20k.stop%28%29%3B%0A%20%20%20%20print%28%27---%27%29%3B%0A%20%20%7D%0A%7D" target="_blank" class="full-btn">Layar Penuh ↗</a>
+        </div>
+        <iframe src="https://dartpad.dev/embed-dart.html?id=2ac19c1124a96ead41e805ce8c8cd116&run=true&v=1234" width="100%" height="440" frameborder="0" loading="lazy"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3. INTERFACE ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-number">3</div>
+      <h2>Interface di Dart (Dart 3.0+)</h2>
+    </div>
+    <div class="card" style="margin-bottom:18px;">
+      <h3>📋 extends vs implements</h3>
+      <table>
+        <thead><tr><th>Aspek</th><th>extends</th><th>implements</th></tr></thead>
+        <tbody>
+          <tr><td>Hubungan</td><td>"is-a"</td><td>"can-do"</td></tr>
+          <tr><td>Inheritance</td><td>Mewarisi implementasi</td><td>Hanya kontrak</td></tr>
+          <tr><td>Method</td><td>Bisa concrete/abstract</td><td>Semua harus di-override</td></tr>
+          <tr><td>Jumlah</td><td>Single inheritance</td><td>Multiple implements</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="code-wrapper">
+      <div class="code-header">
+        <span class="code-lang">🎯 Interface &amp; Multiple Implements</span>
+        
+      </div>
+<pre><span class="cm">// Nama  : Rifqi Prayoga</span>
+<span class="cm">// NIM   : 251410005</span>
+<span class="cm">// Kelas : SI2A</span>
+
+<span class="kw">interface class</span> <span class="cl">Flyable</span> { <span class="kw">void</span> <span class="fn">terbang</span>(); }
+<span class="kw">interface class</span> <span class="cl">Swimmable</span> { <span class="kw">void</span> <span class="fn">berenang</span>(); }
+<span class="kw">class</span> <span class="cl">Burung</span> <span class="kw">implements</span> <span class="cl">Flyable</span> {
+  <span class="at">@override</span> <span class="kw">void</span> <span class="fn">terbang</span>() <span class="op">=></span> <span class="fn">print</span>(<span class="st">'Burung terbang melintas tinggi'</span>);
+}
+<span class="kw">class</span> <span class="cl">Pesawat</span> <span class="kw">implements</span> <span class="cl">Flyable</span> {
+  <span class="at">@override</span> <span class="kw">void</span> <span class="fn">terbang</span>() <span class="op">=></span> <span class="fn">print</span>(<span class="st">'Pesawat terbang cepat'</span>);
+}
+<span class="kw">class</span> <span class="cl">Itik</span> <span class="kw">implements</span> <span class="cl">Flyable</span>, <span class="cl">Swimmable</span> {
+  <span class="at">@override</span> <span class="kw">void</span> <span class="fn">terbang</span>() <span class="op">=></span> <span class="fn">print</span>(<span class="st">'Itik terbang rendah'</span>);
+  <span class="at">@override</span> <span class="kw">void</span> <span class="fn">berenang</span>() <span class="op">=></span> <span class="fn">print</span>(<span class="st">'Itik berenang di kolam'</span>);
+}
+<span class="kw">void</span> <span class="fn">main</span>() {
+  <span class="ty">List</span>&lt;<span class="cl">Flyable</span>&gt; terbang <span class="op">=</span> [<span class="cl">Burung</span>(), <span class="cl">Pesawat</span>(), <span class="cl">Itik</span>()];
+  <span class="fn">print</span>(<span class="st">'=== Semua yang bisa terbang ==='</span>);
+  <span class="kw">for</span> (<span class="kw">var</span> f <span class="kw">in</span> terbang) f.<span class="fn">terbang</span>();
+  <span class="fn">print</span>(<span class="st">'\n=== Yang bisa berenang ==='</span>);
+  <span class="cl">Itik</span>().<span class="fn">berenang</span>();
+}</pre>
+      <div class="out-panel">
+        <div class="out-hdr"><span class="out-lbl">▶ Expected Output</span></div>
+        <div class="out-body">
+          <div class="out-line">=== Semua yang bisa terbang ===</div>
+          <div class="out-line">Burung terbang melintas tinggi</div>
+          <div class="out-line">Pesawat terbang cepat</div>
+          <div class="out-line">Itik terbang rendah</div>
+          <div class="out-line" style="height:10px;"></div>
+          <div class="out-line">=== Yang bisa berenang ===</div>
+          <div class="out-line">Itik berenang di kolam</div>
+        </div>
+      </div>
+      <div class="iframe-wrap">
+        <div class="iframe-hdr">
+          <span>⚡ Live DartPad — Otomatis Berjalan</span>
+          <a href="https://dartpad.dev/?run=true&split=60&source=interface%20class%20Flyable%20%7B%0A%20%20void%20terbang%28%29%20%3D%3E%20print%28%27Terbang...%27%29%3B%0A%7D%0Ainterface%20class%20Swimmable%20%7B%0A%20%20void%20berenang%28%29%20%3D%3E%20print%28%27Berenang...%27%29%3B%0A%7D%0Aclass%20Burung%20implements%20Flyable%20%7B%0A%20%20%40override%0A%20%20void%20terbang%28%29%20%3D%3E%20print%28%27Burung%20terbang%20melintas%20tinggi%27%29%3B%0A%7D%0Aclass%20Pesawat%20implements%20Flyable%20%7B%0A%20%20%40override%0A%20%20void%20terbang%28%29%20%3D%3E%20print%28%27Pesawat%20terbang%20cepat%27%29%3B%0A%7D%0Aclass%20Itik%20implements%20Flyable%2C%20Swimmable%20%7B%0A%20%20%40override%0A%20%20void%20terbang%28%29%20%3D%3E%20print%28%27Itik%20terbang%20rendah%27%29%3B%0A%20%20%40override%0A%20%20void%20berenang%28%29%20%3D%3E%20print%28%27Itik%20berenang%20di%20kolam%27%29%3B%0A%7D%0Avoid%20main%28%29%20%7B%0A%20%20List%3CFlyable%3E%20terbang%20%3D%20%5BBurung%28%29%2C%20Pesawat%28%29%2C%20Itik%28%29%5D%3B%0A%20%20print%28%27%3D%3D%3D%20Semua%20yang%20bisa%20terbang%20%3D%3D%3D%27%29%3B%0A%20%20for%20%28var%20f%20in%20terbang%29%20f.terbang%28%29%3B%0A%20%20print%28%27%27%29%3B%0A%20%20print%28%27%3D%3D%3D%20Yang%20bisa%20berenang%20%3D%3D%3D%27%29%3B%0A%20%20Itik%28%29.berenang%28%29%3B%0A%7D" target="_blank" class="full-btn">Layar Penuh ↗</a>
+        </div>
+        <iframe src="https://dartpad.dev/embed-dart.html?id=b5fcf8ed2139ecc31f04793233f4962c&run=true&v=1234" width="100%" height="440" frameborder="0" loading="lazy"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 4. STATIC ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-number">4</div>
+      <h2>Static Members &amp; Methods</h2>
+    </div>
+    <div class="card">
+      <h3>ℹ️ Konsep</h3>
+      <p>Static member dimiliki <strong>class itu sendiri</strong>, bukan objek. Diakses via nama class tanpa membuat objek. Berguna untuk utility class dan konstanta.</p>
+    </div>
+    <div class="code-wrapper">
+      <div class="code-header">
+        <span class="code-lang">🎯 Static Members &amp; Methods</span>
+       
+      </div>
+<pre><span class="cm">// Nama  : Rifqi Prayoga</span>
+<span class="cm">// NIM   : 251410005</span>
+<span class="cm">// Kelas : SI2A</span>
+
+<span class="kw">class</span> <span class="cl">MathUtils</span> {
+  <span class="kw">static const</span> <span class="ty">double</span> pi <span class="op">=</span> <span class="nu">3.14159</span>;
+  <span class="kw">static</span> <span class="ty">int</span> <span class="fn">add</span>(<span class="ty">int</span> x, <span class="ty">int</span> y) <span class="op">=></span> x <span class="op">+</span> y;
+  <span class="kw">static</span> <span class="ty">int</span> <span class="fn">multiply</span>(<span class="ty">int</span> x, <span class="ty">int</span> y) <span class="op">=></span> x <span class="op">*</span> y;
+  <span class="kw">static</span> <span class="ty">double</span> <span class="fn">lingkaranLuas</span>(<span class="ty">double</span> r) <span class="op">=></span> pi <span class="op">*</span> r <span class="op">*</span> r;
+}
+<span class="kw">void</span> <span class="fn">main</span>() {
+  <span class="fn">print</span>(<span class="st">'Pi = ${MathUtils.pi}'</span>);
+  <span class="fn">print</span>(<span class="st">'10 + 20 = ${MathUtils.add(10, 20)}'</span>);
+  <span class="fn">print</span>(<span class="st">'6 x 7 = ${MathUtils.multiply(6, 7)}'</span>);
+  <span class="fn">print</span>(<span class="st">'Luas r=5 = ${MathUtils.lingkaranLuas(5).toStringAsFixed(2)}'</span>);
+}</pre>
+      <div class="out-panel">
+        <div class="out-hdr"><span class="out-lbl">▶ Expected Output</span></div>
+        <div class="out-body">
+          <div class="out-line">Pi = 3.14159</div>
+          <div class="out-line">10 + 20 = 30</div>
+          <div class="out-line">6 x 7 = 42</div>
+          <div class="out-line">Luas r=5 = 78.54</div>
+        </div>
+      </div>
+      <div class="iframe-wrap">
+        <div class="iframe-hdr">
+          <span>⚡ Live DartPad — Otomatis Berjalan</span>
+          <a href="https://dartpad.dev/?run=true&split=60&source=class%20MathUtils%20%7B%0A%20%20static%20const%20double%20pi%20%3D%203.14159%3B%0A%20%20static%20int%20add%28int%20x%2C%20int%20y%29%20%3D%3E%20x%20%2B%20y%3B%0A%20%20static%20int%20multiply%28int%20x%2C%20int%20y%29%20%3D%3E%20x%20%2A%20y%3B%0A%20%20static%20double%20lingkaranLuas%28double%20r%29%20%3D%3E%20pi%20%2A%20r%20%2A%20r%3B%0A%7D%0Avoid%20main%28%29%20%7B%0A%20%20print%28%27Pi%20%3D%20%24%7BMathUtils.pi%7D%27%29%3B%0A%20%20print%28%2710%20%2B%2020%20%3D%20%24%7BMathUtils.add%2810%2C%2020%29%7D%27%29%3B%0A%20%20print%28%276%20x%207%20%3D%20%24%7BMathUtils.multiply%286%2C%207%29%7D%27%29%3B%0A%20%20print%28%27Luas%20lingkaran%20r%3D5%20%3D%20%24%7BMathUtils.lingkaranLuas%285%29.toStringAsFixed%282%29%7D%27%29%3B%0A%7D" target="_blank" class="full-btn">Layar Penuh ↗</a>
+        </div>
+        <iframe src="https://dartpad.dev/embed-dart.html?id=213bac0c12e683ceff2108f259f065fd&run=true&v=1234" width="100%" height="440" frameborder="0" loading="lazy"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 5. STUDI KASUS ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-number">5</div>
+      <h2>Studi Kasus: Sistem Pembayaran</h2>
+    </div>
+    <p style="font-size:.88rem;color:var(--muted);margin-bottom:14px;">Penggunaan nyata abstract class + interface dalam sistem multi-metode pembayaran.</p>
+    <div class="code-wrapper">
+      <div class="code-header">
+        <span class="code-lang">🎯 Studi Kasus: Sistem Pembayaran</span>
+        
+      </div>
+<pre><span class="cm">// Nama  : Rifqi Prayoga</span>
+<span class="cm">// NIM   : 251410005</span>
+<span class="cm">// Kelas : SI2A</span>
+
+<span class="kw">abstract class</span> <span class="cl">MetodePembayaran</span> {
+  <span class="kw">void</span> <span class="fn">bayar</span>(<span class="ty">double</span> jumlah);
+  <span class="ty">String</span> <span class="fn">getNama</span>();
+}
+<span class="kw">class</span> <span class="cl">KartuKredit</span> <span class="kw">implements</span> <span class="cl">MetodePembayaran</span> {
+  <span class="ty">String</span> noKartu; <span class="cl">KartuKredit</span>(<span class="kw">this</span>.noKartu);
+  <span class="at">@override</span>
+  <span class="kw">void</span> <span class="fn">bayar</span>(<span class="ty">double</span> j) <span class="op">=></span> <span class="fn">print</span>(<span class="st">'Bayar Rp${j.toStringAsFixed(0)} Kartu Kredit (****${noKartu.substring(noKartu.length-4)})'</span>);
+  <span class="at">@override</span> <span class="ty">String</span> <span class="fn">getNama</span>() <span class="op">=></span> <span class="st">'Kartu Kredit'</span>;
+}
+<span class="kw">class</span> <span class="cl">EWallet</span> <span class="kw">implements</span> <span class="cl">MetodePembayaran</span> {
+  <span class="ty">String</span> provider; <span class="cl">EWallet</span>(<span class="kw">this</span>.provider);
+  <span class="at">@override</span>
+  <span class="kw">void</span> <span class="fn">bayar</span>(<span class="ty">double</span> j) <span class="op">=></span> <span class="fn">print</span>(<span class="st">'Bayar Rp${j.toStringAsFixed(0)} EWallet $provider'</span>);
+  <span class="at">@override</span> <span class="ty">String</span> <span class="fn">getNama</span>() <span class="op">=></span> <span class="st">'E-Wallet $provider'</span>;
+}
+<span class="kw">class</span> <span class="cl">Tunai</span> <span class="kw">implements</span> <span class="cl">MetodePembayaran</span> {
+  <span class="at">@override</span>
+  <span class="kw">void</span> <span class="fn">bayar</span>(<span class="ty">double</span> j) <span class="op">=></span> <span class="fn">print</span>(<span class="st">'Bayar Rp${j.toStringAsFixed(0)} Tunai'</span>);
+  <span class="at">@override</span> <span class="ty">String</span> <span class="fn">getNama</span>() <span class="op">=></span> <span class="st">'Tunai'</span>;
+}</pre>
+      <div class="out-panel">
+        <div class="out-hdr"><span class="out-lbl">▶ Expected Output</span></div>
+        <div class="out-body">
+          <div class="out-line">=== Transaksi dengan Kartu Kredit ===</div>
+          <div class="out-line">Bayar Rp150000 Kartu Kredit (****5678)</div>
+          <div class="out-line">Status: Sukses</div>
+          <div class="out-line" style="height:10px;"></div>
+          <div class="out-line">=== Transaksi dengan E-Wallet OVO ===</div>
+          <div class="out-line">Bayar Rp150000 EWallet OVO</div>
+          <div class="out-line">Status: Sukses</div>
+          <div class="out-line" style="height:10px;"></div>
+          <div class="out-line">=== Transaksi dengan Tunai ===</div>
+          <div class="out-line">Bayar Rp150000 Tunai</div>
+          <div class="out-line">Status: Sukses</div>
+        </div>
+      </div>
+      <div class="iframe-wrap">
+        <div class="iframe-hdr">
+          <span>⚡ Live DartPad — Otomatis Berjalan</span>
+          <a href="https://dartpad.dev/?run=true&split=60&source=abstract%20class%20MetodePembayaran%20%7B%0A%20%20void%20bayar%28double%20jumlah%29%3B%0A%20%20String%20getNama%28%29%3B%0A%7D%0Aclass%20KartuKredit%20implements%20MetodePembayaran%20%7B%0A%20%20String%20noKartu%3B%0A%20%20KartuKredit%28this.noKartu%29%3B%0A%20%20%40override%0A%20%20void%20bayar%28double%20jumlah%29%20%3D%3E%0A%20%20%20%20print%28%27Bayar%20Rp%24%7Bjumlah.toStringAsFixed%280%29%7D%20dengan%20Kartu%20Kredit%20%28%2A%2A%2A%2A%24%7BnoKartu.substring%28noKartu.length-4%29%7D%29%27%29%3B%0A%20%20%40override%0A%20%20String%20getNama%28%29%20%3D%3E%20%27Kartu%20Kredit%27%3B%0A%7D%0Aclass%20EWallet%20implements%20MetodePembayaran%20%7B%0A%20%20String%20provider%3B%0A%20%20EWallet%28this.provider%29%3B%0A%20%20%40override%0A%20%20void%20bayar%28double%20jumlah%29%20%3D%3E%0A%20%20%20%20print%28%27Bayar%20Rp%24%7Bjumlah.toStringAsFixed%280%29%7D%20dengan%20EWallet%20%24provider%27%29%3B%0A%20%20%40override%0A%20%20String%20getNama%28%29%20%3D%3E%20%27E-Wallet%20%24provider%27%3B%0A%7D%0Aclass%20Tunai%20implements%20MetodePembayaran%20%7B%0A%20%20%40override%0A%20%20void%20bayar%28double%20jumlah%29%20%3D%3E%0A%20%20%20%20print%28%27Bayar%20Rp%24%7Bjumlah.toStringAsFixed%280%29%7D%20dengan%20Tunai%27%29%3B%0A%20%20%40override%0A%20%20String%20getNama%28%29%20%3D%3E%20%27Tunai%27%3B%0A%7D%0Aclass%20Transaksi%20%7B%0A%20%20void%20proses%28MetodePembayaran%20metode%2C%20double%20total%29%20%7B%0A%20%20%20%20print%28%27%3D%3D%3D%20Transaksi%20dengan%20%24%7Bmetode.getNama%28%29%7D%20%3D%3D%3D%27%29%3B%0A%20%20%20%20metode.bayar%28total%29%3B%0A%20%20%20%20print%28%27Status%3A%20Sukses%27%29%3B%0A%20%20%20%20print%28%27%27%29%3B%0A%20%20%7D%0A%7D%0Avoid%20main%28%29%20%7B%0A%20%20var%20transaksi%20%3D%20Transaksi%28%29%3B%0A%20%20transaksi.proses%28KartuKredit%28%271234-5678-9012-3456%27%29%2C%20150000%29%3B%0A%20%20transaksi.proses%28EWallet%28%27Gopay%27%29%2C%2075000%29%3B%0A%20%20transaksi.proses%28Tunai%28%29%2C%2050000%29%3B%0A%7D" target="_blank" class="full-btn">Layar Penuh ↗</a>
+        </div>
+        <iframe src="https://dartpad.dev/embed-dart.html?id=3ce0b2d43a1c64524ab1550375b58e43&run=true&v=1234" width="100%" height="440" frameborder="0" loading="lazy"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 6. LATIHAN & BONUS ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-number">6</div>
+      <h2>Latihan &amp; Jawaban Bonus</h2>
+    </div>
+
+    <div class="card" style="margin-bottom:6px;">
+      <h3>📝 Tugas 1 + <span class="bonus-tag">BONUS 1</span> — Sistem Pekerja &amp; Polimorfisme</h3>
+      <p>Abstract class <code>Pekerja</code> → class <code>Programmer</code>, <code>Dokter</code>, <code>Guru</code> → <code>List&lt;Pekerja&gt;</code> demonstrasi polimorfisme.</p>
+    </div>
+    <div class="code-wrapper">
+      <div class="code-header">
+        <span class="code-lang">🎯 Bonus 1 — Sistem Pekerja &amp; Polimorfisme</span>
+       
+      </div>
+<pre><span class="cm">// Nama  : Rifqi Prayoga</span>
+<span class="cm">// NIM   : 251410005</span>
+<span class="cm">// Kelas : SI2A</span>
+
+<span class="kw">abstract class</span> <span class="cl">Pekerja</span> {
+  <span class="ty">String</span> nama; <span class="ty">int</span> tahunPengalaman;
+  <span class="cl">Pekerja</span>(<span class="kw">this</span>.nama, <span class="kw">this</span>.tahunPengalaman);
+  <span class="kw">void</span> <span class="fn">bekerja</span>();  <span class="cm">// abstract</span>
+  <span class="kw">void</span> <span class="fn">perkenalkanDiri</span>() {  <span class="cm">// concrete</span>
+    <span class="fn">print</span>(<span class="st">'Hai, saya $nama dengan $tahunPengalaman tahun pengalaman.'</span>);
+  }
+}
+<span class="kw">class</span> <span class="cl">Programmer</span> <span class="kw">extends</span> <span class="cl">Pekerja</span> {
+  <span class="ty">String</span> bahasa;
+  <span class="cl">Programmer</span>(<span class="ty">String</span> nama, <span class="ty">int</span> tahun, <span class="kw">this</span>.bahasa) : <span class="kw">super</span>(nama, tahun);
+  <span class="at">@override</span> <span class="kw">void</span> <span class="fn">bekerja</span>() <span class="op">=></span> <span class="fn">print</span>(<span class="st">'[Programmer] $nama menulis kode $bahasa...'</span>);
+}
+<span class="kw">class</span> <span class="cl">Dokter</span> <span class="kw">extends</span> <span class="cl">Pekerja</span> {
+  <span class="ty">String</span> spesialisasi;
+  <span class="cl">Dokter</span>(<span class="ty">String</span> nama, <span class="ty">int</span> tahun, <span class="kw">this</span>.spesialisasi) : <span class="kw">super</span>(nama, tahun);
+  <span class="at">@override</span> <span class="kw">void</span> <span class="fn">bekerja</span>() <span class="op">=></span> <span class="fn">print</span>(<span class="st">'[Dokter] $nama memeriksa pasien $spesialisasi...'</span>);
+}
+<span class="kw">class</span> <span class="cl">Guru</span> <span class="kw">extends</span> <span class="cl">Pekerja</span> {
+  <span class="ty">String</span> mataPelajaran;
+  <span class="cl">Guru</span>(<span class="ty">String</span> nama, <span class="ty">int</span> tahun, <span class="kw">this</span>.mataPelajaran) : <span class="kw">super</span>(nama, tahun);
+  <span class="at">@override</span> <span class="kw">void</span> <span class="fn">bekerja</span>() <span class="op">=></span> <span class="fn">print</span>(<span class="st">'[Guru] $nama mengajar $mataPelajaran...'</span>);
+}
+<span class="kw">void</span> <span class="fn">main</span>() {
+  <span class="ty">List</span>&lt;<span class="cl">Pekerja</span>&gt; tim <span class="op">=</span> [
+    <span class="cl">Programmer</span>(<span class="st">'Ali'</span>, <span class="nu">5</span>, <span class="st">'Dart'</span>),
+    <span class="cl">Dokter</span>(<span class="st">'Sana'</span>, <span class="nu">10</span>, <span class="st">'Jantung'</span>),
+    <span class="cl">Guru</span>(<span class="st">'Budi'</span>, <span class="nu">8</span>, <span class="st">'Matematika'</span>),
+  ];
+  <span class="kw">for</span> (<span class="kw">var</span> p <span class="kw">in</span> tim) { p.<span class="fn">perkenalkanDiri</span>(); p.<span class="fn">bekerja</span>(); <span class="fn">print</span>(<span class="st">'--'</span>); }
+}</pre>
+      <div class="out-panel">
+        <div class="out-hdr"><span class="out-lbl">▶ Expected Output</span></div>
+        <div class="out-body">
+          <div class="out-line">Hai, saya Ali dengan 5 tahun pengalaman.</div>
+          <div class="out-line">[Programmer] Ali menulis kode Dart...</div>
+          <div class="out-line">--</div>
+          <div class="out-line">Hai, saya Sana dengan 10 tahun pengalaman.</div>
+          <div class="out-line">[Dokter] Sana memeriksa pasien Jantung...</div>
+          <div class="out-line">--</div>
+          <div class="out-line">Hai, saya Budi dengan 8 tahun pengalaman.</div>
+          <div class="out-line">[Guru] Budi mengajar Matematika...</div>
+          <div class="out-line">--</div>
+        </div>
+      </div>
+      <div class="iframe-wrap">
+        <div class="iframe-hdr">
+          <span>⚡ Live DartPad — Otomatis Berjalan</span>
+          <a href="https://dartpad.dev/?run=true&split=60&source=abstract%20class%20Pekerja%20%7B%0A%20%20String%20nama%3B%0A%20%20int%20tahunPengalaman%3B%0A%20%20Pekerja%28this.nama%2C%20this.tahunPengalaman%29%3B%0A%20%20void%20bekerja%28%29%3B%0A%20%20void%20perkenalkanDiri%28%29%20%7B%0A%20%20%20%20print%28%27Hai%2C%20saya%20%24nama%20dengan%20%24tahunPengalaman%20tahun%20pengalaman.%27%29%3B%0A%20%20%7D%0A%7D%0Aclass%20Programmer%20extends%20Pekerja%20%7B%0A%20%20String%20bahasa%3B%0A%20%20Programmer%28String%20nama%2C%20int%20tahun%2C%20this.bahasa%29%20%3A%20super%28nama%2C%20tahun%29%3B%0A%20%20%40override%0A%20%20void%20bekerja%28%29%20%3D%3E%20print%28%27%5BProgrammer%5D%20%24nama%20menulis%20kode%20%24bahasa...%27%29%3B%0A%7D%0Aclass%20Dokter%20extends%20Pekerja%20%7B%0A%20%20String%20spesialisasi%3B%0A%20%20Dokter%28String%20nama%2C%20int%20tahun%2C%20this.spesialisasi%29%20%3A%20super%28nama%2C%20tahun%29%3B%0A%20%20%40override%0A%20%20void%20bekerja%28%29%20%3D%3E%20print%28%27%5BDokter%5D%20%24nama%20memeriksa%20pasien%20%24spesialisasi...%27%29%3B%0A%7D%0Aclass%20Guru%20extends%20Pekerja%20%7B%0A%20%20String%20mataPelajaran%3B%0A%20%20Guru%28String%20nama%2C%20int%20tahun%2C%20this.mataPelajaran%29%20%3A%20super%28nama%2C%20tahun%29%3B%0A%20%20%40override%0A%20%20void%20bekerja%28%29%20%3D%3E%20print%28%27%5BGuru%5D%20%24nama%20mengajar%20%24mataPelajaran...%27%29%3B%0A%7D%0Avoid%20main%28%29%20%7B%0A%20%20List%3CPekerja%3E%20tim%20%3D%20%5B%0A%20%20%20%20Programmer%28%27Ali%27%2C%205%2C%20%27Dart%27%29%2C%0A%20%20%20%20Dokter%28%27Sana%27%2C%2010%2C%20%27Jantung%27%29%2C%0A%20%20%20%20Guru%28%27Budi%27%2C%208%2C%20%27Matematika%27%29%2C%0A%20%20%20%20Programmer%28%27Riz%27%2C%203%2C%20%27Flutter%27%29%2C%0A%20%20%5D%3B%0A%20%20for%20%28var%20p%20in%20tim%29%20%7B%0A%20%20%20%20p.perkenalkanDiri%28%29%3B%0A%20%20%20%20p.bekerja%28%29%3B%0A%20%20%20%20print%28%27--%27%29%3B%0A%20%20%7D%0A%7D" target="_blank" class="full-btn">Layar Penuh ↗</a>
+        </div>
+        <iframe src="https://dartpad.dev/embed-dart.html?id=644ce0c7b428e5a6023444ee7ee8b018&run=true&v=1234" width="100%" height="440" frameborder="0" loading="lazy"></iframe>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:6px;margin-top:28px;">
+      <h3>📝 <span class="bonus-tag">BONUS 2</span> — Class Tablet (Multiple Inheritance)</h3>
+      <p><code>Tablet</code> implements <code>Komputer</code>, <code>Kamera</code>, dan <code>Telepon</code> sekaligus — multiple interface.</p>
+    </div>
+    <div class="code-wrapper">
+      <div class="code-header">
+        <span class="code-lang">🎯 Bonus 2 — Tablet Multiple Inheritance</span>
+       
+      </div>
+<pre><span class="cm">// Nama  : Rifqi Prayoga</span>
+<span class="cm">// NIM   : 251410005</span>
+<span class="cm">// Kelas : SI2A</span>
+
+<span class="kw">interface class</span> <span class="cl">Komputer</span> { <span class="kw">void</span> <span class="fn">jalankanApp</span>(<span class="ty">String</span> app); <span class="kw">void</span> <span class="fn">browse</span>(<span class="ty">String</span> url); }
+<span class="kw">interface class</span> <span class="cl">Kamera</span>   { <span class="kw">void</span> <span class="fn">ambilFoto</span>(<span class="ty">int</span> mp); <span class="kw">void</span> <span class="fn">rekamVideo</span>(<span class="ty">int</span> fps); }
+<span class="kw">interface class</span> <span class="cl">Telepon</span>  { <span class="kw">void</span> <span class="fn">telepon</span>(<span class="ty">String</span> nomor); <span class="kw">void</span> <span class="fn">kirimSms</span>(<span class="ty">String</span> pesan); }
+
+<span class="kw">class</span> <span class="cl">Tablet</span> <span class="kw">implements</span> <span class="cl">Komputer</span>, <span class="cl">Kamera</span>, <span class="cl">Telepon</span> {
+  <span class="ty">String</span> merk, model;
+  <span class="cl">Tablet</span>(<span class="kw">this</span>.merk, <span class="kw">this</span>.model);
+  <span class="at">@override</span> <span class="kw">void</span> <span class="fn">jalankanApp</span>(<span class="ty">String</span> app) <span class="op">=></span> <span class="fn">print</span>(<span class="st">'[$merk] App: $app'</span>);
+  <span class="at">@override</span> <span class="kw">void</span> <span class="fn">browse</span>(<span class="ty">String</span> url)     <span class="op">=></span> <span class="fn">print</span>(<span class="st">'[$merk] Browse: $url'</span>);
+  <span class="at">@override</span> <span class="kw">void</span> <span class="fn">ambilFoto</span>(<span class="ty">int</span> mp)       <span class="op">=></span> <span class="fn">print</span>(<span class="st">'[$merk] Foto: ${mp}MP'</span>);
+  <span class="at">@override</span> <span class="kw">void</span> <span class="fn">rekamVideo</span>(<span class="ty">int</span> fps)     <span class="op">=></span> <span class="fn">print</span>(<span class="st">'[$merk] Video: ${fps}fps'</span>);
+  <span class="at">@override</span> <span class="kw">void</span> <span class="fn">telepon</span>(<span class="ty">String</span> nomor)   <span class="op">=></span> <span class="fn">print</span>(<span class="st">'[$merk] Telepon: $nomor'</span>);
+  <span class="at">@override</span> <span class="kw">void</span> <span class="fn">kirimSms</span>(<span class="ty">String</span> pesan)  <span class="op">=></span> <span class="fn">print</span>(<span class="st">'[$merk] SMS: $pesan'</span>);
+}</pre>
+      <div class="out-panel">
+        <div class="out-hdr"><span class="out-lbl">▶ Expected Output</span></div>
+        <div class="out-body">
+          <div class="out-line">=== Samsung Galaxy Tab S9 ===</div>
+          <div class="out-line">[Samsung Galaxy Tab S9] App: YouTube</div>
+          <div class="out-line">[Samsung Galaxy Tab S9] Browse: https://flutter.dev</div>
+          <div class="out-line">[Samsung Galaxy Tab S9] Foto: 13MP</div>
+          <div class="out-line">[Samsung Galaxy Tab S9] Video: 60fps</div>
+          <div class="out-line">[Samsung Galaxy Tab S9] Telepon: 081234567890</div>
+          <div class="out-line">[Samsung Galaxy Tab S9] SMS: Hello Dart!</div>
+        </div>
+      </div>
+      <div class="iframe-wrap">
+        <div class="iframe-hdr">
+          <span>⚡ Live DartPad — Otomatis Berjalan</span>
+          <a href="https://dartpad.dev/?run=true&split=60&source=interface%20class%20Komputer%20%7B%0A%20%20void%20jalankanApp%28String%20app%29%20%3D%3E%20print%28%27Menjalankan%3A%20%24app%27%29%3B%0A%20%20void%20browse%28String%20url%29%20%3D%3E%20print%28%27Membuka%20URL%3A%20%24url%27%29%3B%0A%7D%0Ainterface%20class%20Kamera%20%7B%0A%20%20void%20ambilFoto%28int%20megapixel%29%20%3D%3E%20print%28%27Foto%20%24megapixel%20MP%27%29%3B%0A%20%20void%20rekamVideo%28int%20fps%29%20%3D%3E%20print%28%27Rekam%20%24fps%20fps%27%29%3B%0A%7D%0Ainterface%20class%20Telepon%20%7B%0A%20%20void%20telepon%28String%20nomor%29%20%3D%3E%20print%28%27Menelepon%3A%20%24nomor%27%29%3B%0A%20%20void%20kirimSms%28String%20pesan%29%20%3D%3E%20print%28%27SMS%3A%20%24pesan%27%29%3B%0A%7D%0Aclass%20Tablet%20implements%20Komputer%2C%20Kamera%2C%20Telepon%20%7B%0A%20%20String%20merk%2C%20model%3B%0A%20%20Tablet%28this.merk%2C%20this.model%29%3B%0A%20%20%40override%20void%20jalankanApp%28String%20app%29%20%3D%3E%20print%28%27%5B%24merk%20%24model%5D%20App%3A%20%24app%27%29%3B%0A%20%20%40override%20void%20browse%28String%20url%29%20%3D%3E%20print%28%27%5B%24merk%20%24model%5D%20Browse%3A%20%24url%27%29%3B%0A%20%20%40override%20void%20ambilFoto%28int%20mp%29%20%3D%3E%20print%28%27%5B%24merk%20%24model%5D%20Foto%3A%20%24%7Bmp%7DMP%27%29%3B%0A%20%20%40override%20void%20rekamVideo%28int%20fps%29%20%3D%3E%20print%28%27%5B%24merk%20%24model%5D%20Video%3A%20%24%7Bfps%7Dfps%27%29%3B%0A%20%20%40override%20void%20telepon%28String%20nomor%29%20%3D%3E%20print%28%27%5B%24merk%20%24model%5D%20Telepon%3A%20%24nomor%27%29%3B%0A%20%20%40override%20void%20kirimSms%28String%20pesan%29%20%3D%3E%20print%28%27%5B%24merk%20%24model%5D%20SMS%3A%20%24pesan%27%29%3B%0A%7D%0Avoid%20main%28%29%20%7B%0A%20%20var%20tablet%20%3D%20Tablet%28%27Samsung%27%2C%20%27Galaxy%20Tab%20S9%27%29%3B%0A%20%20print%28%27%3D%3D%3D%20%24%7Btablet.merk%7D%20%24%7Btablet.model%7D%20%3D%3D%3D%27%29%3B%0A%20%20tablet.jalankanApp%28%27YouTube%27%29%3B%0A%20%20tablet.browse%28%27https%3A//flutter.dev%27%29%3B%0A%20%20tablet.ambilFoto%2813%29%3B%0A%20%20tablet.rekamVideo%2860%29%3B%0A%20%20tablet.telepon%28%27081234567890%27%29%3B%0A%20%20tablet.kirimSms%28%27Hello%20Dart%21%27%29%3B%0A%7D" target="_blank" class="full-btn">Layar Penuh ↗</a>
+        </div>
+        <iframe src="https://dartpad.dev/embed-dart.html?id=a7e1e1cdd8442c000baf8ef664dc82da&run=true&v=1234" width="100%" height="440" frameborder="0" loading="lazy"></iframe>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:6px;margin-top:28px;">
+      <h3>📝 <span class="bonus-tag">BONUS 3</span> — MathUtils Static Methods Lengkap</h3>
+      <p>Faktorial, cek prima, pembulatan, acakInt, acakDouble, rataRata, dan median — semuanya static method.</p>
+    </div>
+    <div class="code-wrapper">
+      <div class="code-header">
+        <span class="code-lang">🎯 Bonus 3 — MathUtils Static Methods Lengkap</span>
+        
+      </div>
+<pre><span class="cm">// Nama  : Rifqi Prayoga</span>
+<span class="cm">// NIM   : 251410005</span>
+<span class="cm">// Kelas : SI2A</span>
+
+<span class="kw">import</span> <span class="st">'dart:math'</span>;
+<span class="kw">class</span> <span class="cl">MathUtils</span> {
+  <span class="kw">static</span> <span class="ty">int</span> <span class="fn">faktorial</span>(<span class="ty">int</span> n) { <span class="kw">if</span> (n<span class="op">&lt;=</span><span class="nu">1</span>) <span class="kw">return</span> <span class="nu">1</span>; <span class="kw">return</span> n <span class="op">*</span> <span class="fn">faktorial</span>(n<span class="op">-</span><span class="nu">1</span>); }
+  <span class="kw">static</span> <span class="ty">bool</span> <span class="fn">adalahPrima</span>(<span class="ty">int</span> n) {
+    <span class="kw">if</span> (n<span class="op">&lt;</span><span class="nu">2</span>) <span class="kw">return</span> <span class="kw">false</span>;
+    <span class="kw">for</span> (<span class="ty">int</span> i<span class="op">=</span><span class="nu">2</span>; i<span class="op">&lt;=</span><span class="fn">sqrt</span>(n.<span class="fn">toDouble</span>()).<span class="fn">toInt</span>(); i<span class="op">++</span>)
+      <span class="kw">if</span> (n<span class="op">%</span>i<span class="op">==</span><span class="nu">0</span>) <span class="kw">return</span> <span class="kw">false</span>;
+    <span class="kw">return</span> <span class="kw">true</span>;
+  }
+  <span class="kw">static</span> <span class="ty">double</span> <span class="fn">bulatkan</span>(<span class="ty">double</span> n, <span class="ty">int</span> d) {
+    <span class="ty">double</span> f <span class="op">=</span> <span class="fn">pow</span>(<span class="nu">10</span>,d).<span class="fn">toDouble</span>(); <span class="kw">return</span> (n<span class="op">*</span>f).<span class="fn">round</span>()<span class="op">/</span>f;
+  }
+  <span class="kw">static</span> <span class="ty">int</span>    <span class="fn">acakInt</span>(<span class="ty">int</span> min, <span class="ty">int</span> max)       <span class="op">=></span> min <span class="op">+</span> <span class="cl">Random</span>().<span class="fn">nextInt</span>(max<span class="op">-</span>min<span class="op">+</span><span class="nu">1</span>);
+  <span class="kw">static</span> <span class="ty">double</span> <span class="fn">acakDouble</span>(<span class="ty">double</span> min, <span class="ty">double</span> max) <span class="op">=></span> min <span class="op">+</span> <span class="cl">Random</span>().<span class="fn">nextDouble</span>()<span class="op">*</span>(max<span class="op">-</span>min);
+  <span class="kw">static</span> <span class="ty">double</span> <span class="fn">rataRata</span>(<span class="ty">List</span>&lt;<span class="ty">num</span>&gt; a) <span class="op">=></span> a.<span class="fn">reduce</span>((x,y)<span class="op">=></span>x<span class="op">+</span>y) <span class="op">/</span> a.length;
+  <span class="kw">static</span> <span class="ty">double</span> <span class="fn">median</span>(<span class="ty">List</span>&lt;<span class="ty">num</span>&gt; a) {
+    <span class="ty">List</span>&lt;<span class="ty">num</span>&gt; s <span class="op">=</span> <span class="cl">List</span>.<span class="fn">from</span>(a)..<span class="fn">sort</span>(); <span class="ty">int</span> m <span class="op">=</span> s.length<span class="op">~/</span><span class="nu">2</span>;
+    <span class="kw">return</span> s.length<span class="op">%</span><span class="nu">2</span><span class="op">==</span><span class="nu">0</span> ? (s[m<span class="op">-</span><span class="nu">1</span>]<span class="op">+</span>s[m])<span class="op">/</span><span class="nu">2</span> : s[m].<span class="fn">toDouble</span>();
+  }
+}</pre>
+      <div class="out-panel">
+        <div class="out-hdr"><span class="out-lbl">▶ Expected Output</span><span class="hint">⚠ Nilai acak berubah tiap run</span></div>
+        <div class="out-body">
+          <div class="out-line">=== MathUtils Demo ===</div>
+          <div class="out-line" style="height:10px;"></div>
+          <div class="out-line">- Faktorial:</div>
+          <div class="out-line">5!  = 120</div>
+          <div class="out-line">10! = 3628800</div>
+          <div class="out-line" style="height:10px;"></div>
+          <div class="out-line">- Bilangan Prima (1-20):</div>
+          <div class="out-line">[2, 3, 5, 7, 11, 13, 17, 19]</div>
+          <div class="out-line" style="height:10px;"></div>
+          <div class="out-line">- Pembulatan:</div>
+          <div class="out-line">3.14159 -&gt; 2 desimal: 3.14</div>
+          <div class="out-line" style="height:10px;"></div>
+          <div class="out-line">- Bilangan Acak:</div>
+          <div class="out-line">Int    [1,100]: <em style='color:#718096'>(angka acak tiap run)</em></div>
+          <div class="out-line">Double [0,1]:   <em style='color:#718096'>(angka acak tiap run)</em></div>
+          <div class="out-line" style="height:10px;"></div>
+          <div class="out-line">- Data: [10, 30, 5, 8, 7, 25, 12]</div>
+          <div class="out-line">Rata-rata: 13.86</div>
+          <div class="out-line">Median:    10.0</div>
+        </div>
+      </div>
+      <div class="iframe-wrap">
+        <div class="iframe-hdr">
+          <span>⚡ Live DartPad — Otomatis Berjalan</span>
+          <a href="https://dartpad.dev/?run=true&split=60&source=import%20%27dart%3Amath%27%3B%0A%0Aclass%20MathUtils%20%7B%0A%20%20static%20int%20faktorial%28int%20n%29%20%7B%0A%20%20%20%20if%20%28n%20%3C%200%29%20throw%20ArgumentError%28%27n%20harus%20%3E%3D%200%27%29%3B%0A%20%20%20%20if%20%28n%20%3C%3D%201%29%20return%201%3B%0A%20%20%20%20return%20n%20%2A%20faktorial%28n%20-%201%29%3B%0A%20%20%7D%0A%20%20static%20bool%20adalahPrima%28int%20n%29%20%7B%0A%20%20%20%20if%20%28n%20%3C%202%29%20return%20false%3B%0A%20%20%20%20for%20%28int%20i%20%3D%202%3B%20i%20%3C%3D%20sqrt%28n.toDouble%28%29%29.toInt%28%29%3B%20i%2B%2B%29%20%7B%0A%20%20%20%20%20%20if%20%28n%20%25%20i%20%3D%3D%200%29%20return%20false%3B%0A%20%20%20%20%7D%0A%20%20%20%20return%20true%3B%0A%20%20%7D%0A%20%20static%20double%20bulatkan%28double%20nilai%2C%20int%20desimal%29%20%7B%0A%20%20%20%20double%20faktor%20%3D%20pow%2810%2C%20desimal%29.toDouble%28%29%3B%0A%20%20%20%20return%20%28nilai%20%2A%20faktor%29.round%28%29%20/%20faktor%3B%0A%20%20%7D%0A%20%20static%20int%20acakInt%28int%20min%2C%20int%20max%29%20%3D%3E%0A%20%20%20%20%20%20min%20%2B%20Random%28%29.nextInt%28max%20-%20min%20%2B%201%29%3B%0A%20%20static%20double%20acakDouble%28double%20min%2C%20double%20max%29%20%3D%3E%0A%20%20%20%20%20%20min%20%2B%20Random%28%29.nextDouble%28%29%20%2A%20%28max%20-%20min%29%3B%0A%20%20static%20double%20rataRata%28List%3Cnum%3E%20angka%29%20%7B%0A%20%20%20%20if%20%28angka.isEmpty%29%20throw%20ArgumentError%28%27List%20tidak%20boleh%20kosong%27%29%3B%0A%20%20%20%20return%20angka.reduce%28%28a%2C%20b%29%20%3D%3E%20a%20%2B%20b%29%20/%20angka.length%3B%0A%20%20%7D%0A%20%20static%20double%20median%28List%3Cnum%3E%20angka%29%20%7B%0A%20%20%20%20if%20%28angka.isEmpty%29%20throw%20ArgumentError%28%27List%20tidak%20boleh%20kosong%27%29%3B%0A%20%20%20%20List%3Cnum%3E%20sorted%20%3D%20List.from%28angka%29..sort%28%29%3B%0A%20%20%20%20int%20mid%20%3D%20sorted.length%20~/%202%3B%0A%20%20%20%20if%20%28sorted.length%20%25%202%20%3D%3D%200%29%20%7B%0A%20%20%20%20%20%20return%20%28sorted%5Bmid%20-%201%5D%20%2B%20sorted%5Bmid%5D%29%20/%202%3B%0A%20%20%20%20%7D%0A%20%20%20%20return%20sorted%5Bmid%5D.toDouble%28%29%3B%0A%20%20%7D%0A%7D%0A%0Avoid%20main%28%29%20%7B%0A%20%20print%28%27%3D%3D%3D%20MathUtils%20Demo%20%3D%3D%3D%27%29%3B%0A%20%20print%28%27%27%29%3B%0A%20%20print%28%27-%20Faktorial%3A%27%29%3B%0A%20%20print%28%27%20%205%21%20%20%3D%20%24%7BMathUtils.faktorial%285%29%7D%27%29%3B%0A%20%20print%28%27%20%2010%21%20%3D%20%24%7BMathUtils.faktorial%2810%29%7D%27%29%3B%0A%20%20print%28%27%27%29%3B%0A%20%20print%28%27-%20Bilangan%20Prima%20%281-20%29%3A%27%29%3B%0A%20%20List%3Cint%3E%20prima%20%3D%20%5B%5D%3B%0A%20%20for%20%28int%20i%20%3D%201%3B%20i%20%3C%3D%2020%3B%20i%2B%2B%29%20%7B%0A%20%20%20%20if%20%28MathUtils.adalahPrima%28i%29%29%20prima.add%28i%29%3B%0A%20%20%7D%0A%20%20print%28%27%20%20%24prima%27%29%3B%0A%20%20print%28%27%27%29%3B%0A%20%20print%28%27-%20Pembulatan%3A%27%29%3B%0A%20%20print%28%27%20%203.14159%20-%3E%202%20desimal%3A%20%24%7BMathUtils.bulatkan%283.14159%2C%202%29%7D%27%29%3B%0A%20%20print%28%27%27%29%3B%0A%20%20print%28%27-%20Bilangan%20Acak%3A%27%29%3B%0A%20%20print%28%27%20%20Int%20%20%20%20%5B1%2C100%5D%3A%20%24%7BMathUtils.acakInt%281%2C%20100%29%7D%27%29%3B%0A%20%20print%28%27%20%20Double%20%5B0%2C1%5D%3A%20%20%20%24%7BMathUtils.acakDouble%280.0%2C%201.0%29.toStringAsFixed%284%29%7D%27%29%3B%0A%20%20print%28%27%27%29%3B%0A%20%20List%3Cint%3E%20data%20%3D%20%5B10%2C%2030%2C%205%2C%208%2C%207%2C%2025%2C%2012%5D%3B%0A%20%20print%28%27-%20Data%3A%20%24data%27%29%3B%0A%20%20print%28%27%20%20Rata-rata%3A%20%24%7BMathUtils.rataRata%28data%29.toStringAsFixed%282%29%7D%27%29%3B%0A%20%20print%28%27%20%20Median%3A%20%20%20%20%24%7BMathUtils.median%28data%29%7D%27%29%3B%0A%7D" target="_blank" class="full-btn">Layar Penuh ↗</a>
+        </div>
+        <iframe src="https://dartpad.dev/embed-dart.html?id=004ef1499deb34fa657fe32a40972229&run=true&v=1234" width="100%" height="440" frameborder="0" loading="lazy"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 7. RINGKASAN ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-number">7</div>
+      <h2>Ringkasan Sesi 4</h2>
+    </div>
+    <div class="summary-box">
+      <h3>🎯 Poin Utama</h3>
+      <ol>
+        <li><strong>Polimorfisme</strong> — Objek child dapat diperlakukan sebagai parent. Runtime polymorphism via method overriding. Gunakan <code>is</code> untuk cek tipe dan <code>as</code> untuk casting.</li>
+        <li><strong>Abstract Class</strong> — Template class yang tidak bisa diinstansiasi langsung. Punya method abstract (wajib di-override) dan concrete (sudah ada body).</li>
+        <li><strong>Interface</strong> — Keyword <code>interface class</code> sejak Dart 3.0. Semua method harus di-override. Mendukung multiple implements.</li>
+        <li><strong>Multiple Inheritance</strong> — Dart tidak support multiple <code>extends</code>, tapi support multiple <code>implements</code>.</li>
+        <li><strong>Static Members</strong> — Milik class, bukan objek. Diakses via nama class. Cocok untuk utility dan konstanta.</li>
+      </ol>
+      <div class="pills" style="margin-top:20px;">
+        <span class="pill">polymorphism</span>
+        <span class="pill teal">abstract class</span>
+        <span class="pill yellow">interface</span>
+        <span class="pill green">static members</span>
+        <span class="pill pink">multiple implements</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Resume Sesi 4 · Polimorfisme &amp; Abstraksi · Dart Programming ·
+  <strong style="color:var(--accent2)">Rifqi Prayoga</strong> · NIM 251410005 · SI2A ·
+  <a href="https://dartpad.dev" target="_blank" style="color:var(--accent2);text-decoration:none;">dartpad.dev</a>
+</footer>
+
+</body>
+</html>
